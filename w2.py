@@ -6,18 +6,7 @@
 5. 코드는 각자의 깃헙에, 최종 이미지 1장은 이 채널에 제출합니다.
 """
 
-import random
-
-
-class Arm:
-    def __init__(self, probability):
-        self.probability = probability
-
-    def pull(self) -> int:
-        if random.random() < self.probability:
-            return 1
-
-        return 0
+from arm import Arm
 
 
 arm_a = Arm(0.1)
