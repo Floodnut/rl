@@ -5,21 +5,29 @@
 4. 위 결과를 scatter plot으로 표현하세요. x축은 E(P(A))가 10%, 20%, …, 90% 이고 y축은 E(P(B))가 10%, 20%, …, 90%를 의미합니다. color는 알고리즘, size는 알고리즘별 평균 승수입니다.
 5. 코드는 각자의 깃헙에, 최종 이미지 1장은 이 채널에 제출합니다.
 """
-
+from itertools import combinations_with_replacement as comb_rpl
 from arm import Arm
+from greedy import Greedy
 
 
-arm_a = Arm(0.1)
-arm_b = Arm(0.1)
+class Week2:
+    def __init__(self):
+        self.time_step = 100
+        self.total_rewards = [0, 0]
+        self.prob = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+        self.win = {"greedy": 0, "e-greedy": 0, "ucb": 0, "thompson_sampling": 0}
 
-time_step = 100
-total_rewards = [0, 0]
+    def run(self):
+        for a, b in comb_rpl(self.prob, 2):
+            for _ in range(5):
+                p_a = Arm(a / 10).pull()
+                p_b = Arm(b / 10).pull()
 
-for _ in range(time_step):
-    p_a = arm_a.pull()
-    p_b = arm_b.pull()
+                self.total_rewards[0] += p_a
+                self.total_rewards[1] += p_b
 
-    total_rewards[0] += p_a
-    total_rewards[1] += p_b
+                Greedy().action(self.total_rewards)
 
-print(total_rewards)
+
+if __name__ == "__main__":
+    Week2().run()
