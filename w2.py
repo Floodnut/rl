@@ -23,10 +23,9 @@ class Week2:
                 p_a = Arm(a / 10).pull()
                 p_b = Arm(b / 10).pull()
 
-                self.total_rewards[0] += p_a
-                self.total_rewards[1] += p_b
+                win, target = Greedy().action(p_a, p_b)
 
-                Greedy().action(self.total_rewards)
+                self.total_rewards[win] += target
 
 
 if __name__ == "__main__":
