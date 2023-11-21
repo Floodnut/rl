@@ -92,6 +92,10 @@ class Blackjack(Environment):
             (10,),
             (10,),
         ]
+        self.player.given_cards = list()
+        self.player.card_sum = 0
+        self.dealer.given_cards = list()
+        self.dealer.card_sum = 0
     
     def draw_random_cards(self, count: int = 1) -> List[int]:
         random.shuffle(self.card_values)
