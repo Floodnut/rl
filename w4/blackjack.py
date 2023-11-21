@@ -26,22 +26,6 @@ class Environment:
             12: 'Q',
             13: 'K'
         }
-        self.card_values = [
-            (0, ),
-            (1, 11),
-            (2,),
-            (3,),
-            (4,),
-            (5,),
-            (6,),
-            (7,),
-            (8,),
-            (9,),
-            (10,),
-            (10,),
-            (10,),
-            (10,),
-        ]
 
 class Agent:
     def __init__(self):
@@ -52,8 +36,8 @@ class Agent:
         self.given_cards.append(card)
         self._sum_card(card)
 
-    def _sum_card(self, new_cards: List[int]):
-        self.card_sum += sum(new_cards)
+    def _sum_card(self, new_cards: int):
+        self.card_sum += new_cards
 
 class Dealer(Agent):
     def __init__(self):
@@ -74,16 +58,63 @@ class Blackjack(Environment):
         super().__init__()
         self.dealer = dealer
         self.player = player
+        self.card_values = [
+            (0, ),
+            (1, 11),
+            (2,),
+            (3,),
+            (4,),
+            (5,),
+            (6,),
+            (7,),
+            (8,),
+            (9,),
+            (10,),
+            (10,),
+            (10,),
+            (10,),
+        ]
+
+    def reset(self):
+        self.card_values = [
+            (0, ),
+            (1, 11),
+            (2,),
+            (3,),
+            (4,),
+            (5,),
+            (6,),
+            (7,),
+            (8,),
+            (9,),
+            (10,),
+            (10,),
+            (10,),
+            (10,),
+        ]
     
     def draw_random_cards(self, count: int = 1) -> List[int]:
         random.shuffle(self.card_values)
-        return self.card_values.pop()
+        return random.choice(self.card_values.pop())
 
     def start(self):
-        new_2_dealer_cards = self.draw_random_cards(count=2)
-        self.dealer.add_card(new_2_dealer_cards)
-        new_2_player_cards = self.draw_random_cards(count=2)
-        self.player.add_card(new_2_player_cards)
+        dealer_cards1, dealer_cards2 = self.draw_random_cards(), self.draw_random_cards()
+        self.dealer.add_card(dealer_cards1)
+        self.dealer.add_card(dealer_cards2)
+
+        player_cards1, player_cards2 = self.draw_random_cards(), self.draw_random_cards()
+        self.dealer.add_card(player_cards1)
+        self.dealer.add_card(player_cards2)
+
+        while self.player.card_sum < 21:
+            action = random.choice(['hit', 'stay'])
+            if action == 'hit':
+               self.player.card_sum += self.draw_random_cards()
+            else:
+                break
+
+        while self.dealer.card_sum < 17:
+            self.dealer.card_sum += self.draw_random_cards()
 
         return self._strict_policy(self.player.card_sum, self.dealer.card_sum)
     
@@ -93,6 +124,7 @@ class Blackjack(Environment):
             result = self.start()
             if result == 1:
                 wins += 1
+            self.reset()
         return wins / num_episodes
 
     def _action_stay(self) -> None:
@@ -126,3 +158,4 @@ class Blackjack(Environment):
 if __name__ == "__main__" :
     blackjack = Blackjack(dealer=Dealer(), player=Player())
     result_mc = blackjack.monte_carlo(1000)
+    print(result_mc)
