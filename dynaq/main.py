@@ -63,7 +63,7 @@ class MazeEnvironment:
             self.current_state = [row + d[0], col + d[1]]
 
 
-        if self.current_state == self.end_state: # terminate if goal is reached
+        if self.current_state == self.end_state: # 종료 조건
             reward = 1.0
             is_terminal = True
 
