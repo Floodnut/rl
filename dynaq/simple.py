@@ -11,7 +11,7 @@ class Model:
         self.state = state
         self.action = action
     
-    def update(self, state:Tuple[int], action: int, reward: int, next_state: Tuple[int]):
+    def update(self):
         pass
     
     def sample(self):
@@ -58,13 +58,13 @@ class Maze:
 class MazeRunner(Maze):
     """agent
     """
-    def __init__(self, limit: int, model: List[Model], q: List[Q]):
+    def __init__(self, limit: int, model, q):
         super().__init__()
         self.cur_state: tuple = self.start
         self.limit = limit
         
         self.model = model
-        self.q = q
+        self.q_values: dict = q
         
         self.reward = 0
         
@@ -77,14 +77,7 @@ class MazeRunner(Maze):
     def __repr__(self):
         pass
     
-    def observe(self):
-        pass
-    
-    def get_max(self):
-        pass
-    
     def dyna_q(self):
-        
         while True:
             # (a) s <- current (nonterminal) state
             s = self.start
@@ -94,6 +87,7 @@ class MazeRunner(Maze):
             
             # (c) Execute action a; observe resultant state, s', and reward, r 
             self.do_action(a)
+            result_state, s_prime, reward, r = self.observe()
             
             # (e) Model(s, a) <- s', r
             self.model_update(self.cur_state, self.reward)
@@ -110,47 +104,60 @@ class MazeRunner(Maze):
                 # Q(s, a) <- Q(s, a) + alpha[r + gamma * max_a' Q(s', a') - Q(s, a)]
                 
                 repeat += 1
+
+    def get_max(self):
+        pass
     
-    def e_greedy(self, state):
+    def e_greedy(self, state) -> int:
         """(b) a <- epsilon-greedy(s, Q)
-        """
-        pass    
-         
-    def do_action(self, state):
-        """(c) Execute action a; observe resultant reward, r, and state, s'
+        
+        Choose action via epsilon-greedy
         """
         if random.random() < self.epsilon:
             action = random.randint(1, 4)
         else:
             values = self.q_values[state]
-            action = self.argmax(values)
+            action = self.get_max(values)
 
         return action
+         
+    def do_action(self, action: int):
+        """(c) Execute action a;
+        
+        Do action to update current state (move state)
+        """
+        self.cur_state += self.actions[action]
+
+    def observe(self):
+        """(c) observe resultant reward, r, and state, s'
+        """
+        return None, None, None, None
     
-    def q_learning(self):
+    def q_learning(self, state, action):
         """(d) Q(s, a) <- Q(s, a) + alpha[r + gamma * max_a' Q(s', a') - Q(s, a)]
         """
-        pass
+        self.q_values[state][action] += self.alpha * (
+            self.reward + self.gamma * self.get_max() - self.q_values[state][action]
+        )
     
-    def model_update(self, new_state, reward):
+    def model_update(self, new_state, action, reward):
         """(e) Model(s, a) <- s', r
         
         Assume deterministic environment
         """
-        self.model.update(self.cur_state, self.action, reward, new_state)
+        self.model.update(self.cur_state, action, reward, new_state)
     
 if __name__ == "__main__":
-    
     for planning_step in [0, 5, 50]:
-        models: List[Model] = []
-        qs: List[Q] = []
+        # Initialize Q(s, a) and Model(s, a) for all s ∈ S, a ∈ A(s)
+        models: dict = []
+        q_values: dict = []
         
         for w, h, a in product(range(9), range(6), range(4)):
-            models.append(Model((w, h), a))
-            qs.append(Q((w, h), a))
+            models[((w, h), a)] = Model((w, h), a)
+            q_values[((w, h), a)] = Q((w, h), a)
 
-        maze = MazeRunner(limit=planning_step, model=models, q=qs)           
-        # Initialize Q(s, a) and Model(s, a) for all s ∈ S, a ∈ A(s)
+        maze = MazeRunner(limit=planning_step, model=models, q=q_values)           
 
         maze_runner = MazeRunner(maze)
         maze_runner.dyna_q()
