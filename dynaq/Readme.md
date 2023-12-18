@@ -1,4 +1,6 @@
 # Dyna-Q with pseudocode
+![algorithm](./algorithm.png)
+
 1. Action selection: 현재 `state`를 바탕으로 할 `action`을 선택합니다. 주로 `e-greedy` 방법을 사용하여 무작위 exploration과 exploitation 사이를 조절합니다.
 
 2. Direct RL: 다음 `state`를 관찰하고, 받은 `reward`를 이용하여 `action values`를 업데이트합니다. 이 과정에서 일반적으로 한 단계의 `tabular Q-learning`을 사용합니다.
