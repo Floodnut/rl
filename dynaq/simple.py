@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from itertools import product
 
 import random
@@ -7,33 +7,29 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Model:
-    def __init__(self, state, action):
+    def __init__(self, state: Tuple[int], action: int):
         self.state = state
         self.action = action
     
-    def update(self, state, action, reward, next_state):
+    def update(self, state:Tuple[int], action: int, reward: int, next_state: Tuple[int]):
         pass
     
     def sample(self):
         pass
     
 class Q:
-    def __init__(self, state, action):
+    def __init__(self, state: Tuple[int], action: int):
         self.state = state
         self.action = action
     
     def update(self, state, action, reward, next_state):
         pass
-    
-    def get_value(self, state, action):
-        pass
-    
-    def get_best_action(self, state):
-        pass
 
-# Environment
 class Maze:
+    """Maze environment
+    """
     def __init__(self):
+        # 0 is road, 1 is wall
         self.maze = [
             [0, 0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -59,8 +55,9 @@ class Maze:
         self.gamma = 0.95
         
 
-# agent  
 class MazeRunner(Maze):
+    """agent
+    """
     def __init__(self, limit: int, model: List[Model], q: List[Q]):
         super().__init__()
         self.cur_state: tuple = self.start
