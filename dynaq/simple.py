@@ -6,24 +6,6 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 
-# class Model:
-#     def __init__(self, state: Tuple[int], action: int):
-#         self.state = state
-#         self.action = action
-    
-#     def update(self):
-#         pass
-    
-#     def sample(self):
-#         pass
-    
-# class Q:
-#     def __init__(self, state: Tuple[int], action: int):
-#         self.state = state
-#         self.action = action
-    
-#     def update(self, state, action, reward, next_state):
-#         pass
 
 class Maze:
     """Maze environment
@@ -80,26 +62,25 @@ class MazeRunner(Maze):
     def _is_valid_pos(self, row, col) -> bool:
         return 0 <= row < self.height and 0 <= col < self.width and self.maze[row][col] == 0
 
-    def get_max(self, s: tuple):
+    def get_max(self, s: tuple) -> float:
         """get max value from q_values
-        """        
-        return max(q_values[s][a] for a in range(4))
+        """
 
-    
+        return max([self.q_values[s][a] for a in range(4)])      
+
+
     def e_greedy(self, state) -> int:
         """(b) a <- epsilon-greedy(s, Q)
         
         Choose action via epsilon-greedy
         """
         if random.random() < self.epsilon:
-            action = random.randint(1, 4)
+            return random.randint(0, 3)
         else:
-            values = self.q_values[state]
-            action = self.get_max(values)
+            return max([0, 1, 2, 3], key=self.q_values[s].get)
 
-        return action
          
-    def do_action(self, action: int) -> None:
+    def do_action(self, action: int) -> Tuple[int]:
         """(c) Execute action a;
         
         Do action to update current state (move state)
@@ -108,30 +89,31 @@ class MazeRunner(Maze):
         d = self.actions[action]
         
         if self._is_valid_pos(self.cur_state[0] + d[0], self.cur_state[1] + d[1]):
-            self.cur_state[0] += d[0]
-            self.cur_state[1] += d[1]
-            
+            return (d[0], d[1])
+        
+        return (0, 0)
 
-    def observe(self) -> tuple:
+    def observe(self, movement: Tuple[int]) -> tuple:
         """(c) observe resultant reward, r, and state, s'
         
         Return next state (s') and reward (r) in tuple
         """
         
-        s_prime = (self.cur_state[0], self.cur_state[1])
+        s_prime = (self.cur_state[0] + movement[0], self.cur_state[1] + movement[1])
         r = -1 if s_prime != self.goal else 0
         
         return s_prime, r
     
-    def q_learning(self, state: tuple, action: int):
+    def q_learning(self, state: tuple, action: int, r: int):
         """(d) Q(s, a) <- Q(s, a) + alpha[r + gamma * max_a' Q(s', a') - Q(s, a)]
         
         Value iteration to get optimal policy
         """
+        
         self.q_values[state][action] += self.alpha * (
-            self.reward + self.gamma * self.get_max() - self.q_values[state][action]
+            r + self.gamma * self.get_max(state) - self.q_values[state][action]
         )
-    
+
     def model_update(self, s: tuple, a: int, s_prime: tuple, r: int):
         """(e) Model(s, a) <- s', r
         
@@ -140,16 +122,16 @@ class MazeRunner(Maze):
         self.model[s][a] = (s_prime, r)
 
     def dyna_q(self):
+        # (a) s <- current (nonterminal) state
+        s = self.start
         while True:
-            # (a) s <- current (nonterminal) state
-            s = self.start
-            
             # (b) a <- epsilon-greedy(s, Q)
             a = self.e_greedy(s)
             
             # (c) Execute action a; observe resultant state, s', and reward, r 
-            self.do_action(a)
-            s_p, r = self.observe()
+            movement = self.do_action(a)
+            s_p, r = self.observe(movement)
+            self.q_learning(s, a, r)
             
             # (e) Model(s, a) <- s', r
             self.model_update(s, a, s_p, r)
@@ -161,17 +143,24 @@ class MazeRunner(Maze):
                 s = random.choice(self.model.keys())
                 
                 # a <- random action previously taken in s
-                a = random.choice(self.model[s].keys())
+                a = random.choice([0, 1, 2, 3])
                 
                 # s', r <- Model(s, a)
                 s_p, r = self.model[s][a]
                 
                 # Q(s, a) <- Q(s, a) + alpha[r + gamma * max_a' Q(s', a') - Q(s, a)]
                 q_values[s][a] += self.alpha * (
-                    r + self.gamma * self.get_max() - q_values[s][a]
+                    r + self.gamma * self.get_max(s) - q_values[s][a]
                 )
                 
                 repeat += 1
+                
+            print(repeat, s_p)
+            if s_p == self.goal:
+                print("Goal!")
+                break
+            
+            s = s_p
                 
     def result(self):
         pass
@@ -182,7 +171,7 @@ if __name__ == "__main__":
         models: dict = {}
         q_values: dict = {}
         
-        for w, h in product(range(9), range(6)):
+        for w, h in product(range(9), range(6)):            
             s = (w, h)
             models[s] = {}
             q_values[s] = {}
@@ -192,3 +181,5 @@ if __name__ == "__main__":
 
         maze_runner = MazeRunner(limit=planning_step, model=models, q=q_values)
         maze_runner.dyna_q()
+        
+        maze_runner.result()
