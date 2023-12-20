@@ -184,9 +184,8 @@ if __name__ == "__main__":
     for planning_step in [0, 50, 500]:
         print(f"Planning step: {planning_step}")
 
-        step = 0
         for episode in range(1000):
-            print(f"Episode: {episode}")        
+            step = 0   
             # Initialize Q(s, a) and Model(s, a) for all s ∈ S, a ∈ A(s)
             models: dict = {}
             q_values: dict = {}
@@ -201,6 +200,7 @@ if __name__ == "__main__":
             maze_runner = MazeRunner(limit=planning_step, model=models, q=q_values)
             step = maze_runner.dyna_q()
             
-        steps_per_episode[planning_step].append(step)
+            print(f"Episode {episode} finished in {step} steps")     
+            steps_per_episode[planning_step].append(step)
         
-        print(steps_per_episode)
+    print(steps_per_episode)
