@@ -183,19 +183,19 @@ if __name__ == "__main__":
     
     for planning_step in [0, 50, 500]:
         print(f"Planning step: {planning_step}")
+        # Initialize Q(s, a) and Model(s, a) for all s ∈ S, a ∈ A(s)
+        models: dict = {}
+        q_values: dict = {}
+        
+        for h, w in product(range(6), range(9)):            
+            s = (h, w)
+            q_values[s] = {}
+            
+            for a in range(4):
+                q_values[s][a] = random.random() / 100
 
         for episode in range(1000):
             step = 0   
-            # Initialize Q(s, a) and Model(s, a) for all s ∈ S, a ∈ A(s)
-            models: dict = {}
-            q_values: dict = {}
-            
-            for h, w in product(range(6), range(9)):            
-                s = (h, w)
-                q_values[s] = {}
-                
-                for a in range(4):
-                    q_values[s][a] = random.random() / 100
 
             maze_runner = MazeRunner(limit=planning_step, model=models, q=q_values)
             step = maze_runner.dyna_q()
