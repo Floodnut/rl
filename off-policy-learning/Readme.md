@@ -1,4 +1,3 @@
-# Dyna-Q with pseudocode
 ![exercise](./7.10.png)
 
 ## Exercise 7.10 (programming) 
