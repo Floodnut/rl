@@ -1,3 +1,4 @@
+from typing import List
 import matplotlib.pyplot as plt
 
 
@@ -14,17 +15,12 @@ class OffPolicy:
         self.gamma = 0.95
         self.rho = 0.5
 
-    def calculate_n_step_return(self, rewards, values):
+    def calculate_n_step_return(self, rewards: float, values: List[float]) -> float:
         """7.1
 
         return G (n-step return)
         """
-        n = len(rewards)
-        n_step_return = 0
-        for i in range(n - 1):
-            n_step_return += self.gamma ** i * rewards[i]
-        n_step_return += self.gamma ** n * values[-1]
-        return n_step_return
+        return (self.gamma ** rewards) + (self.gamma ** values[-1])
 
     def update_value_7_9(self, value, n_step_return):
         """7.9
@@ -35,20 +31,19 @@ class OffPolicy:
         new_value = value + self.alpha * self.rho * (n_step_return - value)
         return new_value
 
-    def calculate_n_step_return_with_rho(self, rewards, values):
+    def calculate_n_step_return_with_rho(self, rewards: float, values: List[float]) -> float:
         """7.13
 
         return G (n-step return) with sampling ratio rho
         """
-        n = len(rewards)
         rho_return = self.rho * (
-            sum([self.gamma ** i * rewards[i] for i in range(n)])
-            + self.gamma ** n * values[-1]
+            sum([self.gamma ** rewards])
+            + self.gamma ** values[-1]
         )
 
-        return rho_return + (1 - self.rho) * values[n - 1]
+        return rho_return + (1 - self.rho) * values[-1]
 
-    def update_value_7_2(self, value, n_step_return):
+    def update_value_7_2(self, value, n_step_return) -> float:
         """7.2
 
         update V (value function) with sampling ratio rho
@@ -67,28 +62,26 @@ class OffPolicy:
 if __name__ == "__main__":
 
     off_policy = OffPolicy()
-    rewards_a = [0]
+    rewards_a = 0
     updated_values_a = [0]
 
     n = 1000
     for _ in range(n):
         # 7.1 + 7.9
         n_step_return_19 = off_policy.calculate_n_step_return(rewards_a, updated_values_a)
-        updated_value_19 = off_policy.update_value_7_9(updated_values_a[len(updated_values_a) - 1], n_step_return_19)
+        updated_value_19 = off_policy.update_value_7_9(updated_values_a[-1], n_step_return_19)
         updated_values_a.append(updated_value_19)
 
     print(updated_values_a)
 
-    rewards_b = [0.5]
+    rewards_b = 0
     updated_values_b = [0.1]
     for _ in range(n):
         # 7.13 + 7.2 (with rho)
         n_step_return_132 = off_policy.calculate_n_step_return_with_rho(rewards_b, updated_values_a)
-        updated_value_132 = off_policy.update_value_7_2(updated_values_b[len(updated_values_b) - 1], n_step_return_132)
+        updated_value_132 = off_policy.update_value_7_2(updated_values_b[-1], n_step_return_132)
         updated_values_b.append(updated_value_132)
 
     print(updated_values_b)
 
     off_policy.draw(updated_values_a, updated_values_b)
-
-
