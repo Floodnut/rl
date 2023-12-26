@@ -10,7 +10,8 @@ class OffPolicy:
         using (7.13) and (7.2) is more data efficient
         than the simpler algorithm using (7.1) and (7.9).
     """
-    def __init__(self):
+    def __init__(self, is_negative: bool = False):
+        self.is_negative = is_negative
         self.alpha = 0.01
         self.gamma = 0.95
         self.rho = 0.5
@@ -81,7 +82,7 @@ if __name__ == "__main__":
     print(updated_values_a)
 
     rewards_b = 0
-    updated_values_b = [0.1]
+    updated_values_b = [0]
     for _ in range(n):
         # 7.13 + 7.2 (with rho)
         n_step_return_132 = off_policy.calculate_n_step_return_with_rho(
