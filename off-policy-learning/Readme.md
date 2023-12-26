@@ -4,6 +4,11 @@
 
 Devise a small off-policy prediction problem and use it to show that the off-policy learning algorithm using (7.13) and (7.2) is more data efficient than the simpler algorithm using (7.1) and (7.9).
 
+```bash
+pip install matplotlib
+python simple.py
+```
+
 ### 7.9의 경우 (+ 7.1)
 
 샘플링 비율 `ρ`를 값 함수 `V`를 업데이트하기 위해 사용한다.

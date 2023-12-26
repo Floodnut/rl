@@ -2,6 +2,7 @@ from typing import List
 import matplotlib.pyplot as plt
 
 
+
 class OffPolicy:
     """7.10
 
@@ -54,7 +55,7 @@ class OffPolicy:
         update V (value function) with sampling ratio rho
         """
         return value + self.alpha * (n_step_return - value)
-    
+
     def draw(self, values_a: List[float], values_b: List[float]) -> None:
         plt.plot(values_a, label="7.1 + 7.9")
         plt.plot(values_b, label="7.13 + 7.2")
