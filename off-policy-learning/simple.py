@@ -15,14 +15,16 @@ class OffPolicy:
         self.gamma = 0.95
         self.rho = 0.5
 
-    def calculate_n_step_return(self, rewards: float, values: List[float]) -> float:
+    def calculate_n_step_return(self,
+                                rewards: float,
+                                values: List[float]) -> float:
         """7.1
 
         return G (n-step return)
         """
         return (self.gamma ** rewards) + (self.gamma ** values[-1])
 
-    def update_value_7_9(self, value, n_step_return):
+    def update_value_7_9(self, value: float, n_step_return: float):
         """7.9
 
         update V (value function)
@@ -31,7 +33,9 @@ class OffPolicy:
         new_value = value + self.alpha * self.rho * (n_step_return - value)
         return new_value
 
-    def calculate_n_step_return_with_rho(self, rewards: float, values: List[float]) -> float:
+    def calculate_n_step_return_with_rho(self,
+                                         rewards: float,
+                                         values: List[float]) -> float:
         """7.13
 
         return G (n-step return) with sampling ratio rho
@@ -43,16 +47,16 @@ class OffPolicy:
 
         return rho_return + (1 - self.rho) * values[-1]
 
-    def update_value_7_2(self, value, n_step_return) -> float:
+    def update_value_7_2(self, value: float, n_step_return: float) -> float:
         """7.2
 
         update V (value function) with sampling ratio rho
         """
         return value + self.alpha * (n_step_return - value)
     
-    def draw(self, updated_values_a, updated_values_b) -> None:
-        plt.plot(updated_values_a, label="7.1 + 7.9")
-        plt.plot(updated_values_b, label="7.2 + 7.13")
+    def draw(self, values_a: List[float], values_b: List[float]) -> None:
+        plt.plot(values_a, label="7.1 + 7.9")
+        plt.plot(values_b, label="7.13 + 7.2")
         plt.xlabel('Iterations')
         plt.ylabel('Updated Value')
         plt.legend()
@@ -68,8 +72,10 @@ if __name__ == "__main__":
     n = 1000
     for _ in range(n):
         # 7.1 + 7.9
-        n_step_return_19 = off_policy.calculate_n_step_return(rewards_a, updated_values_a)
-        updated_value_19 = off_policy.update_value_7_9(updated_values_a[-1], n_step_return_19)
+        n_step_return_19 = off_policy.calculate_n_step_return(
+            rewards_a, updated_values_a)
+        updated_value_19 = off_policy.update_value_7_9(
+            updated_values_a[-1], n_step_return_19)
         updated_values_a.append(updated_value_19)
 
     print(updated_values_a)
@@ -78,8 +84,10 @@ if __name__ == "__main__":
     updated_values_b = [0.1]
     for _ in range(n):
         # 7.13 + 7.2 (with rho)
-        n_step_return_132 = off_policy.calculate_n_step_return_with_rho(rewards_b, updated_values_a)
-        updated_value_132 = off_policy.update_value_7_2(updated_values_b[-1], n_step_return_132)
+        n_step_return_132 = off_policy.calculate_n_step_return_with_rho(
+            rewards_b, updated_values_a)
+        updated_value_132 = off_policy.update_value_7_2(
+            updated_values_b[-1], n_step_return_132)
         updated_values_b.append(updated_value_132)
 
     print(updated_values_b)
